@@ -1,9 +1,17 @@
 import logging
 from pynput import keyboard
 import time
+import os
 
-# Configure logging
-logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
+log_level = os.getenv('LOGLEVEL', 'DEBUG').upper()
+if log_level not in ['DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL']:
+    log_level = 'DEBUG'  # Default to DEBUG if invalid level is set
+logging.basicConfig(level=log_level, format='%(asctime)s - %(levelname)s - %(message)s')
+logging.info(f"Logging level set to: {log_level}")
+
+
+# Initialize start time for inactivity tracking
+start_time = None
 
 
 def load_expansions(file_path):
@@ -37,7 +45,9 @@ def on_press(key):
         global start_time
         if start_time is not None:
             elapsed_time = time.time() - start_time
-            print(f'Time Elapsed: {elapsed_time:.2f} seconds')
+            if elapsed_time > 2:  # Reset buffer if no key pressed for 2 seconds
+                typed_text.clear()
+                logging.debug("Buffer cleared due to inactivity.")
         else:
             start_time = time.time()
 
@@ -50,7 +60,7 @@ def on_press(key):
                 typed_text.pop()
         elif key in {keyboard.Key.space, keyboard.Key.enter}:
             #typed_text.append(' ')
-            process_typed_text()
+            #process_typed_text()
             typed_text.clear()
         #terminate if esc is pressed
         elif key == keyboard.Key.esc:
@@ -62,9 +72,9 @@ def on_press(key):
         logging.error(f"Error on key press: {e}")
 
 def on_release(key):
-    print('key release')
     global start_time
     start_time = time.time()
+    process_typed_text()
 
 
 def process_typed_text():
@@ -77,7 +87,7 @@ def process_typed_text():
             logging.debug(f"Expanding: {word} -> {expanded_text}")
 
             # Simulate pressing backspace to delete the abbreviation and space
-            backspace_count = len(word) + 1
+            backspace_count = len(word)# + 1
             for _ in range(backspace_count):
                 controller.press(keyboard.Key.backspace)
                 controller.release(keyboard.Key.backspace)
@@ -89,6 +99,8 @@ def process_typed_text():
             for char in expanded_text:
                 controller.type(char)
                 logging.debug(f"Typed character: {char}")
+
+            typed_text.clear()
 
     except Exception as e:
         logging.error(f"Error processing typed text: {e}")
@@ -103,3 +115,4 @@ except KeyboardInterrupt:
     logging.info("Text expander stopped.")
 except Exception as e:
     logging.error(f"Error starting listener: {e}")
+
