@@ -9,11 +9,6 @@ if log_level not in ['DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL']:
 logging.basicConfig(level=log_level, format='%(asctime)s - %(levelname)s - %(message)s')
 logging.info(f"Logging level set to: {log_level}")
 
-
-# Initialize start time for inactivity tracking
-start_time = None
-
-
 def load_expansions(file_path):
     """
     Load expansions from a file.
@@ -32,13 +27,7 @@ def load_expansions(file_path):
     return expansions
 
 
-# Load expansions from the file, create this file with your abbreviations
-# e.g.
-# hello:Hello, World!
-expansions = load_expansions('expansions.txt')
 
-typed_text = []  # Buffer to store typed characters
-controller = keyboard.Controller()  # Initialize the controller
 
 def on_press(key):
     try:
@@ -62,12 +51,6 @@ def on_press(key):
             #typed_text.append(' ')
             #process_typed_text()
             typed_text.clear()
-        #terminate if esc is pressed
-        elif key == keyboard.Key.esc:
-            logging.info("Exiting text expander.")
-            #terminate
-            listener.stop()
-            exit(0)
     except Exception as e:
         logging.error(f"Error on key press: {e}")
 
@@ -89,8 +72,7 @@ def process_typed_text():
             # Simulate pressing backspace to delete the abbreviation and space
             backspace_count = len(word)# + 1
             for _ in range(backspace_count):
-                controller.press(keyboard.Key.backspace)
-                controller.release(keyboard.Key.backspace)
+                controller.tap(keyboard.Key.backspace)
                 logging.debug("Pressed backspace")
                 time.sleep(0.01)
 
@@ -106,13 +88,36 @@ def process_typed_text():
         logging.error(f"Error processing typed text: {e}")
 
 
-# Set up the keyboard listener
-try:
-    with keyboard.Listener(on_press=on_press,on_release=on_release) as listener:
-        listener.join()
-                
-except KeyboardInterrupt:
-    logging.info("Text expander stopped.")
-except Exception as e:
-    logging.error(f"Error starting listener: {e}")
 
+if __name__ == "__main__":
+    # Load expansions from the file, create this file with your abbreviations
+    # e.g.
+    # hello:Hello, World!
+    expansions = load_expansions('expansions.txt')
+
+    typed_text = []  # Buffer to store typed characters
+    controller = keyboard.Controller()  # Initialize the controller
+
+    # Initialize start time for inactivity tracking
+    start_time = None
+
+    try:
+        with keyboard.Events() as events:
+            for event in events:
+                if event.key == keyboard.Key.esc:
+                    raise KeyboardInterrupt  # Exit on Escape key press
+                else:
+                    #print('Received event {}'.format(event))
+                    #if an object is pynput.keyboard.Events.Press
+                    if isinstance(event, keyboard.Events.Press):
+                        on_press(event.key)
+                    elif isinstance(event, keyboard.Events.Release):
+                        on_release(event.key)
+                    else:
+                        logging.debug(f"Received event: {event}")
+                    print(type(event))
+    except KeyboardInterrupt:
+        logging.info("Text expander stopped.")
+    except Exception as e:
+        logging.error(f"Error starting listener: {e}")
+    
