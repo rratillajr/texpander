@@ -1,5 +1,88 @@
-brb:be right back
-omw:on my way
-idk:I don't know
-smh:shaking my head
-btw:by the way
+# Text Expander - Sample Expansions File
+# Format: abbreviation:expansion text
+# Lines starting with # are comments
+
+# Single-line expansions (backward compatible)
+..email:your.email@example.com
+..name:Your Full Name
+..phone:+1-555-123-4567
+
+# Multi-line expansions using YAML-style syntax
+# Use 'abbreviation: |' followed by indented lines (2 spaces)
+
+..addr: |
+  123 Main Street
+  Anytown, ST 12345
+  USA
+
+..sig: |
+  Best regards,
+
+  Your Full Name
+  Software Engineer
+  Company Name
+
+# Email templates for common responses
+..thanks: |
+  Dear [Name],
+
+  Thank you for your email. I have received your message and will respond within 24 hours.
+
+  Best regards,
+  Your Name
+
+..meeting: |
+  Hi [Name],
+
+  I hope this email finds you well. I would like to schedule a meeting to discuss [topic].
+
+  Please let me know your availability for the following times:
+  - [Date/Time Option 1]
+  - [Date/Time Option 2]
+  - [Date/Time Option 3]
+
+  Looking forward to hearing from you.
+
+  Best regards,
+  Your Name
+
+..followup: |
+  Hi [Name],
+
+  I wanted to follow up on our previous conversation regarding [topic].
+
+  Could you please provide an update on the status? If you need any additional information from my side, please let me know.
+
+  Thank you for your time.
+
+  Best regards,
+  Your Name
+
+# Common phrases (single-line)
+..ty:Thank you
+..yw:You're welcome
+..lmk:Let me know
+..fyi:For your information
+
+# Technical shortcuts
+..py:python
+..js:javascript
+
+# Multi-line code template
+..html: |
+  <!DOCTYPE html>
+  <html>
+  <head>
+      <title></title>
+  </head>
+  <body>
+
+  </body>
+  </html>
+
+# Instructions:
+# 1. Single-line format: abbreviation:expansion text
+# 2. Multi-line format: abbreviation: | followed by indented lines (2 spaces)
+# 3. Keep this file private and never commit it to version control
+# 4. Use abbreviations that are unlikely to be typed accidentally
+# 5. Multi-line expansions are perfect for email templates and code snippets
